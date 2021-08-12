@@ -17,7 +17,15 @@ class RabbitHoleViewSet(viewsets.ModelViewSet):
         return super().create(request, *args, **kwargs)
 
     def filter_queryset(self, queryset):
-        return queryset
+        hole_id = self.kwargs.get('pk')
+        if hole_id:
+            queryset = queryset.filter(pk=hole_id)
+
+        user = self.request.user
+        if user.is_superuser:
+            return queryset
+        else:
+            return queryset.filter(owner=user)
 
 
 class BunnyViewSet(viewsets.ModelViewSet):
